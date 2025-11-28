@@ -1,3 +1,4 @@
+using Scalar.AspNetCore;
 using Trackify.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
+
+    // Redirect root to API documentation
+    app.MapGet("/", () => Results.Redirect("/scalar/v1"));
 }
 
 app.UseHttpsRedirection();
