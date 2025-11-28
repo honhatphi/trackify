@@ -1,0 +1,4 @@
+{
+  "allowed_tools": ["ReadFile", "WriteFile", "ListDirectory", "RunTests", "Git*"],
+  "denied_patterns": ["sudo*", "rm -rf*", "chmod 777*", ".env", ".env.*", "id_rsa*", "known_hosts"]
+}

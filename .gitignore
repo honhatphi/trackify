@@ -1,0 +1,17 @@
+# Node & Frontend
+node_modules/
+dist/
+build/
+.env
+.DS_Store
+
+# .NET & Backend
+bin/
+obj/
+.vs/
+*.user
+*.suo
+[Dd]ebug/
+[Rr]elease/
+appsettings.Development.json
+!appsettings.json
