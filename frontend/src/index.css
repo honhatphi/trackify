@@ -1,68 +1,548 @@
+/* =============================================================================
+ * Trackify - Global Styles
+ * Per 06_ui_ux_design_system.md
+ * Optimized Color System for Light/Dark Mode
+ * =========================================================================== */
+
+/* Google Fonts - Inter (Primary) + JetBrains Mono (Monospace) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Tailwind v4 Import */
+@import "tailwindcss";
+
+/* Enable dark mode with .dark class selector */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =============================================================================
+ * CSS Variables - Design System Colors
+ * Using Slate palette for better contrast and modern look
+ * =========================================================================== */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* ===== Color Scheme Indicator ===== */
+  color-scheme: light;
+
+  /* ===== Primary Brand Colors ===== */
+  --color-primary: #2563EB;         /* Blue-600 */
+  --color-primary-hover: #1D4ED8;   /* Blue-700 */
+  --color-primary-light: #DBEAFE;   /* Blue-100 */
+  --color-primary-dark: #1E40AF;    /* Blue-800 */
+
+  /* ===== Semantic Status Colors ===== */
+  --color-success: #10B981;         /* Emerald-500 */
+  --color-success-light: #D1FAE5;   /* Emerald-100 */
+  --color-success-dark: #059669;    /* Emerald-600 */
+
+  --color-warning: #F59E0B;         /* Amber-500 */
+  --color-warning-light: #FEF3C7;   /* Amber-100 */
+  --color-warning-dark: #D97706;    /* Amber-600 */
+
+  --color-error: #EF4444;           /* Red-500 */
+  --color-error-light: #FEE2E2;     /* Red-100 */
+  --color-error-dark: #DC2626;      /* Red-600 */
+
+  --color-info: #3B82F6;            /* Blue-500 */
+  --color-info-light: #DBEAFE;      /* Blue-100 */
+
+  /* ===== Neutral Colors - Slate Palette (Light Mode) ===== */
+  --color-bg-primary: #FFFFFF;      /* White - Main background */
+  --color-bg-secondary: #F8FAFC;    /* Slate-50 - Secondary background */
+  --color-bg-tertiary: #F1F5F9;     /* Slate-100 - Cards, panels */
+  --color-bg-elevated: #FFFFFF;     /* White - Elevated surfaces */
+
+  --color-border-primary: #E2E8F0;  /* Slate-200 */
+  --color-border-secondary: #CBD5E1; /* Slate-300 */
+
+  --color-text-primary: #0F172A;    /* Slate-900 - Main text */
+  --color-text-secondary: #475569;  /* Slate-600 - Secondary text */
+  --color-text-tertiary: #64748B;   /* Slate-500 - Muted text */
+  --color-text-disabled: #94A3B8;   /* Slate-400 - Disabled */
+  --color-text-inverse: #FFFFFF;    /* White - Text on dark bg */
+
+  /* ===== Typography ===== */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ===== Glassmorphism - Light Mode ===== */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg-hover: rgba(255, 255, 255, 0.95);
+  --glass-blur: 16px;
+  --glass-border: rgba(226, 232, 240, 0.8);
+  --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+
+  /* ===== Shadows - Light Mode ===== */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+
+  /* ===== 3D Scene Colors - Light Mode ===== */
+  --scene-bg: #F1F5F9;              /* Slate-100 */
+  --scene-ground: #CBD5E1;          /* Slate-300 */
+  --scene-rack-vertical: #1E40AF;   /* Blue-800 */
+  --scene-rack-horizontal: #EA580C; /* Orange-600 */
+  --scene-pallet: #F8FAFC;          /* Slate-50 */
+  --scene-pallet-empty: #E2E8F0;    /* Slate-200 */
+  --scene-source: #F59E0B;          /* Amber-500 */
+  --scene-target: #22C55E;          /* Green-500 */
+  --scene-aisle: #94A3B8;           /* Slate-400 */
+  --scene-elevator: #8B5CF6;        /* Violet-500 */
+
+  /* ===== Spacing ===== */
+  --header-height: 64px;
+
+  /* ===== Transitions ===== */
+  --transition-fast: 150ms;
+  --transition-normal: 250ms;
+  --transition-slow: 350ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =============================================================================
+ * Dark Mode Variables
+ * =========================================================================== */
+.dark {
+  /* ===== Color Scheme Indicator ===== */
+  color-scheme: dark;
+
+  /* ===== Primary Brand - Slightly lighter for dark bg ===== */
+  --color-primary: #3B82F6;         /* Blue-500 */
+  --color-primary-hover: #60A5FA;   /* Blue-400 */
+  --color-primary-light: #1E3A5F;   /* Custom dark blue */
+
+  /* ===== Semantic - Adjusted for dark mode visibility ===== */
+  --color-success: #34D399;         /* Emerald-400 */
+  --color-success-light: #064E3B;   /* Emerald-900 */
+  --color-warning: #FBBF24;         /* Amber-400 */
+  --color-warning-light: #78350F;   /* Amber-900 */
+  --color-error: #F87171;           /* Red-400 */
+  --color-error-light: #7F1D1D;     /* Red-900 */
+
+  /* ===== Neutral Colors - Slate Palette (Dark Mode) ===== */
+  --color-bg-primary: #0F172A;      /* Slate-900 */
+  --color-bg-secondary: #1E293B;    /* Slate-800 */
+  --color-bg-tertiary: #334155;     /* Slate-700 */
+  --color-bg-elevated: #1E293B;     /* Slate-800 */
+
+  --color-border-primary: #334155;  /* Slate-700 */
+  --color-border-secondary: #475569; /* Slate-600 */
+
+  --color-text-primary: #F8FAFC;    /* Slate-50 */
+  --color-text-secondary: #CBD5E1;  /* Slate-300 */
+  --color-text-tertiary: #94A3B8;   /* Slate-400 */
+  --color-text-disabled: #64748B;   /* Slate-500 */
+  --color-text-inverse: #0F172A;    /* Slate-900 */
+
+  /* ===== Glassmorphism - Dark Mode ===== */
+  --glass-bg: rgba(30, 41, 59, 0.85);
+  --glass-bg-hover: rgba(30, 41, 59, 0.95);
+  --glass-blur: 16px;
+  --glass-border: rgba(71, 85, 105, 0.5);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  /* ===== Shadows - Dark Mode ===== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+
+  /* ===== 3D Scene Colors - Dark Mode ===== */
+  --scene-bg: #1E293B;              /* Slate-800 */
+  --scene-ground: #334155;          /* Slate-700 */
+  --scene-rack-vertical: #3B82F6;   /* Blue-500 */
+  --scene-rack-horizontal: #F97316; /* Orange-500 */
+  --scene-pallet: #E2E8F0;          /* Slate-200 */
+  --scene-pallet-empty: #475569;    /* Slate-600 */
+  --scene-source: #FBBF24;          /* Amber-400 */
+  --scene-target: #4ADE80;          /* Green-400 */
+  --scene-aisle: #64748B;           /* Slate-500 */
+  --scene-elevator: #A78BFA;        /* Violet-400 */
+}
+
+/* =============================================================================
+ * Base Styles
+ * =========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
   line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
   min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-normal) var(--ease-in-out),
+              color var(--transition-normal) var(--ease-in-out);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* =============================================================================
+ * Typography
+ * =========================================================================== */
+.font-mono {
+  font-family: var(--font-mono);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+/* =============================================================================
+ * Custom Utility Classes
+ * =========================================================================== */
+
+/* Enhanced Glassmorphism */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: all var(--transition-normal) var(--ease-out-expo);
+}
+
+.glass:hover {
+  background: var(--glass-bg-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-300);
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-400);
+}
+
+/* =============================================================================
+ * Animation Keyframes - Enhanced
+ * =========================================================================== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  0% {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-up {
+  0% {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-down {
+  0% {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation Classes - Smoother with longer duration */
+.animate-fade-in {
+  animation: fade-in 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-in-down {
+  animation: slide-in-down 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* Staggered animations for lists */
+.animate-stagger > * {
+  opacity: 0;
+  animation: slide-in-up var(--transition-slow) var(--ease-out-expo) forwards;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 300ms; }
+
+/* Hover lift effect - smoother */
+.hover-lift {
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Active press effect - with transition */
+.active-press {
+  transition: transform 100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.active-press:active {
+  transform: scale(0.96);
+}
+
+/* =============================================================================
+ * 3D Canvas Container
+ * =========================================================================== */
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+  background: linear-gradient(135deg, #1a1c2c 0%, #2d3436 100%);
+}
+
+.canvas-container canvas {
+  display: block;
+}
+
+/* =============================================================================
+ * Enhanced Overlay Panels
+ * =========================================================================== */
+.overlay-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-normal) var(--ease-out-expo);
+}
+
+.overlay-panel:hover {
+  box-shadow: var(--shadow-xl);
+  background: var(--glass-bg-hover);
+}
+
+/* =============================================================================
+ * Interactive Elements - Smooth Transitions
+ * =========================================================================== */
+button, a, input, select, textarea {
+  transition: all var(--transition-fast) var(--ease-in-out);
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Ripple effect container */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.3s;
+}
+
+.ripple-container:active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition: 0s;
+}
+
+/* =============================================================================
+ * Status Indicators - Enhanced
+ * =========================================================================== */
+.status-indicator {
+  position: relative;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+.status-indicator.status-online::before {
+  background: rgba(16, 185, 129, 0.4);
+}
+
+.status-indicator.status-error::before {
+  background: rgba(239, 68, 68, 0.4);
+}
+
+.status-indicator.status-warning::before {
+  background: rgba(245, 158, 11, 0.4);
+}
+
+/* =============================================================================
+ * Card Hover Effects
+ * =========================================================================== */
+.card-interactive {
+  transition: all var(--transition-normal) var(--ease-out-expo);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.card-interactive:active {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* =============================================================================
+ * Theme Transition - Smooth
+ * =========================================================================== */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color var(--transition-slow) var(--ease-in-out),
+              border-color var(--transition-slow) var(--ease-in-out),
+              color var(--transition-slow) var(--ease-in-out),
+              box-shadow var(--transition-slow) var(--ease-in-out) !important;
 }
