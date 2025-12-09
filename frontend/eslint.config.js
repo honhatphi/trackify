@@ -23,7 +23,9 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
+      // Allow exporting hooks and utilities alongside components in warehouse module
+      'react-refresh/only-export-components': ['warn', { allowExportNames: ['useCameraFocus', 'useCellTooltip', 'useSimulation', 'useIsSimulating', 'useDarkMode', 'CameraFocusProvider', 'SimulationProvider'] }],
     },
   },
 ])

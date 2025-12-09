@@ -3,7 +3,7 @@
  * Shows detailed information when hovering over cells in 3D view
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { CELL_STATES } from './constants';
 
 /**

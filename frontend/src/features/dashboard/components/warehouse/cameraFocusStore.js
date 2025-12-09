@@ -9,7 +9,7 @@ import { create } from 'zustand';
 // Shuttle positions registry (outside React)
 const shuttlePositions = new Map();
 
-export const useCameraFocusStore = create((set, get) => ({
+export const useCameraFocusStore = create((set) => ({
   // State
   isFollowing: false,
   targetId: null,

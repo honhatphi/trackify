@@ -17,9 +17,14 @@ import {
   Pin,
   ChevronRight,
   X,
+  Activity,
+  AlertTriangle,
+  Battery,
+  Layers,
+  Boxes,
 } from 'lucide-react';
 
-import WarehouseStructure, { CameraFocusProvider, CameraController, ShuttleFocusSelector, useCameraFocus } from './components/warehouse';
+import WarehouseStructure, { CameraFocusProvider, CameraController, ShuttleFocusSelector } from './components/warehouse';
 import VisualizationDashboard from './components/warehouse/VisualizationDashboard';
 import { TaskListPanel } from './components/TaskListPanel';
 import { MainLayout } from '@/layouts';
@@ -228,7 +233,7 @@ const SimulationControls = () => {
 /**
  * Compact Stats Bar - Horizontal bar with key metrics
  */
-const CompactStatsBar = ({ onExpand }) => {
+const CompactStatsBar = () => {
   const onlineCount = useDashboardStore(selectOnlineCount);
   const errorCount = useDashboardStore(selectErrorCount);
   const taskCount = useDashboardStore(selectActiveTaskCount);
@@ -364,7 +369,7 @@ const StatsPanel = () => {
         Quick Stats
       </h2>
       <div className="space-y-2.5 animate-stagger">
-        {stats.map((stat, index) => (
+        {stats.map((stat) => (
           <div
             key={stat.label}
             className="flex items-center gap-3 rounded-xl bg-gray-50/80 p-3

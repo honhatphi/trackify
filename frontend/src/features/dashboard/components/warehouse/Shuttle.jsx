@@ -112,6 +112,7 @@ const Shuttle = ({
     console.log(`[Shuttle ${id}] Initialized at Layer ${layer} (Y=${layerY})`);
     console.log(`[Shuttle ${id}] Position: [${animState.currentX}, ${layerY}, ${animState.currentZ}]`);
     console.log(`[Shuttle ${id}] Phase: ${animState.phase}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, layer, layerY]);
 
   // Boundary limits for shuttle movement
@@ -129,7 +130,8 @@ const Shuttle = ({
   useFrame((state, delta) => {
     const speed = 1.2;
     const liftSpeed = 0.5;
-    let { currentX, currentZ, targetX, targetZ, phase, wheelRotation, movingOnX, hasCargo, liftHeight, targetStorageX, targetStorageZ } = animState;
+    let { currentX, currentZ, targetX, targetZ, phase, wheelRotation, movingOnX, liftHeight, targetStorageX, targetStorageZ } = animState;
+    const _hasCargo = animState.hasCargo; // Prefixed with _ to indicate intentionally unused
 
     // Register shuttle position immediately to ensure it's tracked even if we return early
     registerShuttle(id, {
@@ -498,15 +500,9 @@ const Shuttle = ({
     const startPoint = [currentX, layerY + 0.5, currentZ];
     points.push(startPoint);
 
-    // Determine destination based on phase
-    let destX = currentX;
-    let destZ = currentZ;
-
     switch (phase) {
       case 'moveToStorage':
         // First go along aisle (Z), then enter storage (X)
-        destX = targetStorageX;
-        destZ = targetStorageZ;
         // Waypoint at aisle intersection
         if (Math.abs(currentZ - targetStorageZ) > 0.1) {
           points.push([AISLE.CENTER_X, layerY + 0.5, targetStorageZ]);
@@ -515,14 +511,10 @@ const Shuttle = ({
         break;
 
       case 'enterStorage':
-        destX = targetStorageX;
-        destZ = targetStorageZ;
         points.push([targetStorageX, layerY + 0.5, targetStorageZ]);
         break;
 
       case 'exitElevator':
-        destX = AISLE.CENTER_X;
-        destZ = currentZ;
         points.push([AISLE.CENTER_X, layerY + 0.5, currentZ]);
         // Add next destination (storage)
         points.push([AISLE.CENTER_X, layerY + 0.5, targetStorageZ]);
@@ -530,19 +522,15 @@ const Shuttle = ({
         break;
 
       case 'returnToAisle':
-        destX = AISLE.CENTER_X;
         points.push([AISLE.CENTER_X, layerY + 0.5, currentZ]);
         points.push([AISLE.CENTER_X, layerY + 0.5, elevatorZ]);
         break;
 
       case 'returnToElevator':
-        destZ = elevatorZ;
         points.push([AISLE.CENTER_X, layerY + 0.5, elevatorZ]);
         break;
 
       case 'moveToElevator':
-        destX = elevatorX;
-        destZ = elevatorZ;
         if (Math.abs(currentZ - elevatorZ) > 0.1) {
           points.push([currentX, layerY + 0.5, elevatorZ]);
         }

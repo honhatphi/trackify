@@ -59,14 +59,16 @@ const StorageCells = () => {
     CELL_SIZE * 0.78,
     CARTON_HEIGHT,
     CELL_SIZE * 0.78
-  ), []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  ), [CELL_SIZE]);
 
   // Geometry for packing tape stripe
   const tapeGeometry = useMemo(() => new THREE.BoxGeometry(
     CELL_SIZE * 0.79,
     CARTON_HEIGHT * 0.15,
     CELL_SIZE * 0.79
-  ), []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  ), [CELL_SIZE]);
 
   // Geometry for empty slot indicator
   const emptyGeometry = useMemo(() => new THREE.BoxGeometry(
