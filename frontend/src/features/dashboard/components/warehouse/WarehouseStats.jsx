@@ -4,12 +4,13 @@
  */
 
 import { useMemo } from 'react';
-import { CELL_STATES, BLOCK1, BLOCK2 } from './constants';
+import { BLOCK1, BLOCK2 } from './constants';
+import { useDashboardStore } from '../../../../store/useDashboardStore';
 
 /**
- * Calculate warehouse statistics from cell states
+ * Calculate warehouse statistics from inventory
  */
-const calculateStats = () => {
+const calculateStats = (inventory) => {
     const stats = {
         total: 0,
         occupied: 0,
@@ -21,7 +22,7 @@ const calculateStats = () => {
         byLayer: Array(7).fill(null).map(() => ({ total: 0, occupied: 0, empty: 0 })),
     };
 
-    CELL_STATES.forEach((cell) => {
+    inventory.forEach((cell) => {
         stats.total++;
         const block = cell.block;
         const layer = cell.layer;
@@ -99,7 +100,9 @@ const OccupancyBar = ({ label, occupied, total }) => {
  * Main statistics dashboard component
  */
 const WarehouseStats = () => {
-    const stats = useMemo(() => calculateStats(), []);
+    const inventory = useDashboardStore((state) => state.inventory);
+    const inventoryVersion = useDashboardStore((state) => state.inventoryVersion);
+    const stats = useMemo(() => calculateStats(inventory), [inventory, inventoryVersion]);
     const occupancyRate = Math.round((stats.occupied / stats.total) * 100);
 
     return (

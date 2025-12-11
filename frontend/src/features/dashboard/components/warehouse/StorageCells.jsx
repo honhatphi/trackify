@@ -7,7 +7,8 @@ import { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
 import { useDarkMode } from './hooks';
-import { getThemeColors, CELL_SIZE, CELL_STATES, binToPosition } from './constants';
+import { getThemeColors, CELL_SIZE, binToPosition } from './constants';
+import { useDashboardStore } from '../../../../store/useDashboardStore';
 
 /**
  * Optimized instanced mesh for storage cells with inox pallets and carton boxes
@@ -16,6 +17,10 @@ import { getThemeColors, CELL_SIZE, CELL_STATES, binToPosition } from './constan
 const StorageCells = () => {
   const isDark = useDarkMode();
   const COLORS = useMemo(() => getThemeColors(isDark), [isDark]);
+
+  // Get inventory from store with version tracking
+  const inventory = useDashboardStore((state) => state.inventory);
+  const inventoryVersion = useDashboardStore((state) => state.inventoryVersion);
 
   // Refs for instanced meshes
   const emptyMeshRef = useRef();
@@ -28,7 +33,7 @@ const StorageCells = () => {
     const empty = [];
     const occupied = [];
 
-    CELL_STATES.forEach((cell, cellId) => {
+    inventory.forEach((cell, cellId) => {
       const position = binToPosition(cell.block, cell.layer, cell.row, cell.depth);
       const cellData = { position, cellId };
 
@@ -40,7 +45,7 @@ const StorageCells = () => {
     });
 
     return { empty, occupied };
-  }, []);
+  }, [inventory, inventoryVersion]);
 
   // Geometry dimensions
   const RAIL_HEIGHT = 0.04;

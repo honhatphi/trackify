@@ -544,10 +544,19 @@ const DashboardPage = () => {
   });
   const startSimulation = useDashboardStore((state) => state.startSimulation);
   const stopSimulation = useDashboardStore((state) => state.stopSimulation);
+  const initializeWarehouse = useDashboardStore((state) => state.initializeWarehouse);
+  const isInitialized = useDashboardStore((state) => state.isInitialized);
   const errorCount = useDashboardStore(selectErrorCount);
 
   // OrbitControls ref for camera focus
   const orbitControlsRef = useRef(null);
+
+  // Initialize warehouse on mount
+  useEffect(() => {
+    if (!isInitialized) {
+      initializeWarehouse();
+    }
+  }, [isInitialized, initializeWarehouse]);
 
   // Calculate system status for header
   const systemStatus = {

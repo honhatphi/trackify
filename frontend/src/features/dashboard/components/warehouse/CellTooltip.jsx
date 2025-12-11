@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { CELL_STATES } from './constants';
+import { useDashboardStore } from '../../../../store/useDashboardStore';
 
 /**
  * Tooltip component with cell information
@@ -12,7 +12,8 @@ import { CELL_STATES } from './constants';
 const CellTooltip = ({ cellId, position }) => {
     if (!cellId) return null;
 
-    const cell = CELL_STATES.get(cellId);
+    const inventory = useDashboardStore((state) => state.inventory);
+    const cell = inventory.get(cellId);
     if (!cell) return null;
 
     return (

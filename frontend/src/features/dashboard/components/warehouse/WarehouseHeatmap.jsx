@@ -3,20 +3,24 @@
  * Top-down view showing occupancy levels with color coding
  */
 
-import { useMemo, useState } from 'react';
-import { CELL_STATES, BLOCK1, BLOCK2 } from './constants';
+import { useMemo, useState, useEffect } from 'react';
+import { BLOCK1, BLOCK2 } from './constants';
+import { useDashboardStore } from '../../../../store/useDashboardStore';
 
 /**
- * Generate heatmap data for a specific layer
+ * Generate heatmap data for a specific layer from inventory
+ * @param {Map} inventory - Current inventory state from store
+ * @param {number} layer - Layer index (0-based: 0-6)
  */
-const generateHeatmapData = (layer) => {
+const generateHeatmapData = (inventory, layer) => {
     const data = {
         block1: Array(BLOCK1.ROWS).fill(null).map(() => Array(3).fill(0)),
         block2: Array(BLOCK2.ROWS).fill(null).map(() => Array(8).fill(0)),
     };
 
-    CELL_STATES.forEach((cell) => {
-        if (cell.layer !== layer) return;
+    inventory.forEach((cell) => {
+        // Convert 0-based layer index to 1-based layer number (1-7)
+        if (cell.layer !== layer + 1) return;
 
         const block = cell.block === 1 ? 'block1' : 'block2';
         const row = cell.row;
@@ -64,7 +68,7 @@ const BlockHeatmap = ({ blockData, blockNum, rows, depths, selectedLayer }) => {
         <div className="flex flex-col">
             {/* Block Title */}
             <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Block {blockNum} ({depths} depths)
+                Block {blockNum}
             </div>
 
             {/* Grid with labels */}
@@ -154,9 +158,22 @@ const LayerSelector = ({ selectedLayer, onLayerChange }) => {
 const WarehouseHeatmap = () => {
     const [selectedLayer, setSelectedLayer] = useState(0);
 
+    // Get inventory from store with version tracking
+    const inventory = useDashboardStore((state) => state.inventory);
+    const inventoryVersion = useDashboardStore((state) => state.inventoryVersion);
+    const initializeWarehouse = useDashboardStore((state) => state.initializeWarehouse);
+    const isInitialized = useDashboardStore((state) => state.isInitialized);
+
+    // Initialize warehouse on mount
+    useEffect(() => {
+        if (!isInitialized) {
+            initializeWarehouse();
+        }
+    }, [isInitialized, initializeWarehouse]);
+
     const heatmapData = useMemo(
-        () => generateHeatmapData(selectedLayer),
-        [selectedLayer]
+        () => generateHeatmapData(inventory, selectedLayer),
+        [inventory, inventoryVersion, selectedLayer]
     );
 
     return (

@@ -230,18 +230,56 @@ export const generateMockBins = () => {
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 /**
+ * Parse location from bin ID
+ * Handles both rack positions (B1-L2-R05-D1) and aisle positions (AISLE-L2-R14)
+ * @param {string} binId - Bin ID to parse
+ * @returns {{row: number, layer: number, block: number | null, depth: number | null} | null}
+ */
+const parseLocationFromBin = (binId) => {
+  if (!binId) return null;
+
+  // Handle aisle positions (AISLE-L2-R14)
+  const aisleMatch = binId.match(/AISLE-L(\d+)-R(\d+)/);
+  if (aisleMatch) {
+    return {
+      row: parseInt(aisleMatch[2]),
+      layer: parseInt(aisleMatch[1]),
+      block: null,
+      depth: null,
+    };
+  }
+
+  // Handle rack positions (B1-L2-R05-D1)
+  const rackMatch = binId.match(/B(\d+)-L(\d+)-R(\d+)-D(\d+)/);
+  if (rackMatch) {
+    return {
+      row: parseInt(rackMatch[3]),
+      layer: parseInt(rackMatch[2]),
+      block: parseInt(rackMatch[1]),
+      depth: parseInt(rackMatch[4]),
+    };
+  }
+
+  return null;
+};
+
+/**
  * Simulate warehouse state by updating shuttle positions and statuses
+ * Now includes intelligent task-driven movement
  *
  * Movement Rules:
- * 1. Shuttles move continuously along Y-axis (rows) in the aisle
- * 2. Each shuttle stays on its assigned layer (no layer changes in simulation)
- * 3. X position stays in aisle center (shuttle doesn't enter racks in this sim)
- * 4. Shuttles patrol back and forth along the rows
+ * 1. If shuttle has pending/in-progress task, move toward task target
+ * 2. Otherwise, patrol randomly along the aisle
+ * 3. Each shuttle stays on its assigned layer (no layer changes)
+ * 4. X position stays in aisle center
  *
  * @param {import('../types/index.js').Shuttle[]} currentShuttles - Current shuttles array
+ * @param {import('../types/index.js').Task[]} tasks - Current tasks array
+ * @param {Function} startNextTask - Callback to start next task when shuttle arrives at source
+ * @param {Function} completeNextTask - Callback to complete task when shuttle arrives at target
  * @returns {import('../types/index.js').Shuttle[]} New shuttles array with updated positions
  */
-export const simulateWarehouseState = (currentShuttles) => {
+export const simulateWarehouseState = (currentShuttles, tasks = [], startNextTask = null, completeNextTask = null) => {
   return currentShuttles.map((shuttle) => {
     // Skip offline shuttles - they don't move or update
     if (!shuttle.isOnline) {
@@ -257,6 +295,11 @@ export const simulateWarehouseState = (currentShuttles) => {
       return shuttle;
     }
 
+    // Find active task for this shuttle
+    const activeTask = tasks?.find(
+      t => t.shuttleId === shuttle.id && (t.status === 'pending' || t.status === 'in_progress')
+    );
+
     // Calculate new position
     let newX = AISLE.CENTER_X;
     let newY = shuttle.y;
@@ -266,41 +309,79 @@ export const simulateWarehouseState = (currentShuttles) => {
 
     // IDLE shuttles have high chance to resume moving
     if (shuttle.status === 'IDLE') {
-      if (Math.random() < RESUME_CHANCE) {
+      if (Math.random() < RESUME_CHANCE || activeTask) {
         newStatus = 'MOVING';
       }
     }
 
-    // MOVING shuttles patrol along the aisle
+    // MOVING shuttles - task-driven or patrol
     if (newStatus === 'MOVING') {
-      // Determine movement direction based on current position
-      // Use shuttle direction stored in a simple pattern: move toward center, then to edges
-      const centerRow = Math.floor(GRID.Y / 2);
-      const distanceToCenter = centerRow - shuttle.y;
-
-      // Move toward a target, creating patrol behavior
+      let targetRow = null;
       let moveDirection = 0;
-      if (Math.abs(distanceToCenter) < 2) {
-        // Near center, randomly pick direction
-        moveDirection = Math.random() > 0.5 ? 1 : -1;
-      } else {
-        // Move based on which half of aisle we're in, occasionally reverse
-        moveDirection = distanceToCenter > 0 ? 1 : -1;
-        if (Math.random() < 0.2) moveDirection *= -1; // Occasionally reverse
+
+      // If there's an active task, move toward task location
+      if (activeTask) {
+        // Parse target location from cellId
+        const targetLocation = activeTask.status === 'pending'
+          ? parseLocationFromBin(activeTask.sourceBin)
+          : parseLocationFromBin(activeTask.targetBin);
+
+        if (targetLocation) {
+          targetRow = targetLocation.row;
+
+          // Check if shuttle has arrived
+          const hasArrived = Math.abs(shuttle.y - targetRow) < 1;
+
+          if (hasArrived) {
+            if (activeTask.status === 'pending') {
+              // Arrived at source - start task (pick up cargo)
+              if (startNextTask) {
+                startNextTask(shuttle.id);
+              }
+              newStatus = 'LOADING'; // Brief loading state
+            } else if (activeTask.status === 'in_progress') {
+              // Arrived at target - complete task (drop off cargo)
+              if (completeNextTask) {
+                completeNextTask(shuttle.id);
+              }
+              newStatus = 'IDLE'; // Pause after completing
+            }
+            // Don't move this tick - simulate loading/unloading
+            newY = shuttle.y;
+          } else {
+            // Move toward target
+            moveDirection = targetRow > shuttle.y ? 1 : -1;
+          }
+        }
       }
 
-      // Apply movement with randomness
-      const moveAmount = Math.random() < 0.8 ? MAX_MOVE_STEP : 0; // 80% chance to move
-      newY = clamp(shuttle.y + (moveDirection * moveAmount), 0, GRID.Y - 1);
+      // If no task or no target parsed, patrol randomly
+      if (!targetRow) {
+        const centerRow = Math.floor(GRID.Y / 2);
+        const distanceToCenter = centerRow - shuttle.y;
 
-      // Drain battery slowly when moving
-      if (newY !== shuttle.y) {
-        newBattery = Math.max(10, shuttle.battery - BATTERY_DRAIN_PER_MOVE);
+        if (Math.abs(distanceToCenter) < 2) {
+          moveDirection = Math.random() > 0.5 ? 1 : -1;
+        } else {
+          moveDirection = distanceToCenter > 0 ? 1 : -1;
+          if (Math.random() < 0.2) moveDirection *= -1;
+        }
+
+        // Occasionally pause when no task
+        if (Math.random() < PAUSE_CHANCE * 2) {
+          newStatus = 'IDLE';
+        }
       }
 
-      // Very small chance to pause momentarily
-      if (Math.random() < PAUSE_CHANCE) {
-        newStatus = 'IDLE';
+      // Apply movement
+      if (moveDirection !== 0 && newStatus === 'MOVING') {
+        const moveAmount = Math.random() < 0.8 ? MAX_MOVE_STEP : 0;
+        newY = clamp(shuttle.y + (moveDirection * moveAmount), 0, GRID.Y - 1);
+
+        // Drain battery when moving
+        if (newY !== shuttle.y) {
+          newBattery = Math.max(10, shuttle.battery - BATTERY_DRAIN_PER_MOVE);
+        }
       }
     }
 
