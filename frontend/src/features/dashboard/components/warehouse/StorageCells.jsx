@@ -82,30 +82,30 @@ const StorageCells = () => {
     CELL_SIZE * 0.3
   ), []);
 
-  // Materials - reactive to theme changes
-  const materials = useMemo(() => ({
-    empty: new THREE.MeshStandardMaterial({
-      color: COLORS.EMPTY,
-      transparent: true,
-      opacity: isDark ? 0.3 : 0.4,
-      roughness: 0.9,
-    }),
-    palletNormal: new THREE.MeshStandardMaterial({
-      color: COLORS.PALLET_INOX,
-      roughness: 0.2,
-      metalness: 0.9,
-    }),
-    cartonNormal: new THREE.MeshStandardMaterial({
-      color: COLORS.CARTON_BOX,
-      roughness: 0.85,
-      metalness: 0,
-    }),
-    tapeNormal: new THREE.MeshStandardMaterial({
-      color: COLORS.CARTON_TAPE,
-      roughness: 0.5,
-      metalness: 0.1,
-    }),
-  }), [COLORS, isDark]);
+  // Materials - create refs to maintain references across theme changes
+  const materialsRef = useRef({
+    empty: new THREE.MeshStandardMaterial({ roughness: 0.9 }),
+    palletNormal: new THREE.MeshStandardMaterial({ roughness: 0.2, metalness: 0.9 }),
+    cartonNormal: new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0 }),
+    tapeNormal: new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1 }),
+  });
+
+  // Update material colors when theme changes (without recreating materials)
+  useEffect(() => {
+    materialsRef.current.empty.color.set(COLORS.EMPTY);
+    materialsRef.current.empty.transparent = true;
+    materialsRef.current.empty.opacity = isDark ? 0.3 : 0.4;
+    materialsRef.current.empty.needsUpdate = true;
+
+    materialsRef.current.palletNormal.color.set(COLORS.PALLET_INOX);
+    materialsRef.current.palletNormal.needsUpdate = true;
+
+    materialsRef.current.cartonNormal.color.set(COLORS.CARTON_BOX);
+    materialsRef.current.cartonNormal.needsUpdate = true;
+
+    materialsRef.current.tapeNormal.color.set(COLORS.CARTON_TAPE);
+    materialsRef.current.tapeNormal.needsUpdate = true;
+  }, [COLORS, isDark]);
 
   // Update instanced mesh transforms
   useEffect(() => {
@@ -142,7 +142,7 @@ const StorageCells = () => {
       {cellsByState.empty.length > 0 && (
         <instancedMesh
           ref={emptyMeshRef}
-          args={[emptyGeometry, materials.empty, cellsByState.empty.length]}
+          args={[emptyGeometry, materialsRef.current.empty, cellsByState.empty.length]}
           frustumCulled={true}
         />
       )}
@@ -152,17 +152,17 @@ const StorageCells = () => {
         <>
           <instancedMesh
             ref={palletNormalRef}
-            args={[palletGeometry, materials.palletNormal, cellsByState.occupied.length]}
+            args={[palletGeometry, materialsRef.current.palletNormal, cellsByState.occupied.length]}
             frustumCulled={true}
           />
           <instancedMesh
             ref={cartonNormalRef}
-            args={[cartonGeometry, materials.cartonNormal, cellsByState.occupied.length]}
+            args={[cartonGeometry, materialsRef.current.cartonNormal, cellsByState.occupied.length]}
             frustumCulled={true}
           />
           <instancedMesh
             ref={tapeNormalRef}
-            args={[tapeGeometry, materials.tapeNormal, cellsByState.occupied.length]}
+            args={[tapeGeometry, materialsRef.current.tapeNormal, cellsByState.occupied.length]}
             frustumCulled={true}
           />
         </>
